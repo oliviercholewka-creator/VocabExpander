@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lexicon">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/000000/FFFFFF/?text=L">
+    
+    <title>Sophisticated Lexicon</title>
+    <style>
+        /* Modern, iOS-style CSS */
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-main: #1c1c1e;
+            --text-muted: #8e8e93;
+            --accent: #007aff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* App Header */
+        header {
+            padding: 50px 20px 20px 20px; /* Extra top padding for iPhone notch/Dynamic Island */
+            background-color: var(--card-bg);
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        /* Content Area */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none; /* Hidden by default, toggled via JS */
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        /* Word Card */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .word-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .word-def {
+            font-size: 18px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e5e5ea;
+            color: var(--accent);
+        }
+
+        /* Favorites List */
+        .fav-list {
+            list-style: none;
+        }
+
+        .fav-item {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .fav-item-text strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        
+        .fav-item-text span {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-weight: bold;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            display: flex;
+            background-color: var(--card-bg);
+            border-top: 1px solid #e5e5ea;
+            padding-bottom: 20px; /* Home indicator space */
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--accent);
+        }
+
+        /* Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <header>Lexicon</header>
+    <div id="toast" class="toast">Added to favorites!</div>
+
+    <div id="view-discover" class="content active">
+        <div class="card">
+            <div class="word-title" id="display-word">Loading...</div>
+            <div class="word-def" id="display-def">...</div>
+        </div>
+        <button class="btn btn-primary" onclick="generateWord()">Discover Another</button>
+        <button class="btn btn-secondary" onclick="addToFavorites()">Save to Favorites</button>
+    </div>
+
+    <div id="view-favorites" class="content">
+        <ul class="fav-list" id="favorites-list">
+            </ul>
+    </div>
+
+    <div class="tab-bar">
+        <div class="tab active" id="tab-discover" onclick="switchTab('discover')">Discover</div>
+        <div class="tab" id="tab-favorites" onclick="switchTab('favorites')">Favorites</div>
+    </div>
+
+    <script>
+        // A starter dictionary of sophisticated/unusual words
+        const dictionary = [
+            { word: "Petrichor", definition: "The earthy scent produced when rain falls on dry soil." },
+            { word: "Defenestration", definition: "The act of throwing someone or something out of a window." },
+            { word: "Susurrus", definition: "Whispering, murmuring, or rustling." },
+            { word: "Mellifluous", definition: "Sweet or musical; pleasant to hear." },
+            { word: "Syzygy", definition: "An alignment of three celestial objects." },
+            { word: "Ineffable", definition: "Too great or extreme to be expressed or described in words." },
+            { word: "Ultracrepidarian", definition: "A person who gives opinions beyond their area of expertise." },
+            { word: "Ephemeral", definition: "Lasting for a very short time." },
+            { word: "Obfuscate", definition: "To render obscure, unclear, or unintelligible." },
+            { word: "Cacophony", definition: "A harsh, discordant mixture of sounds." },
+            { word: "Sesquipedalian", definition: "Characterized by long words; long-winded." },
+            { word: "Serendipity", definition: "The occurrence and development of events by chance in a happy or beneficial way." }
+        ];
+
+        let currentWordObj = {};
+        let favorites = JSON.parse(localStorage.getItem('lexicon_favorites')) || [];
+
+        // App Initialization
+        function init() {
+            generateWord();
+            renderFavorites();
+        }
+
+        // Generate a random word from the dictionary
+        function generateWord() {
+            const randomIndex = Math.floor(Math.random() * dictionary.length);
+            currentWordObj = dictionary[randomIndex];
+            document.getElementById('display-word').innerText = currentWordObj.word;
+            document.getElementById('display-def').innerText = currentWordObj.definition;
+        }
+
+        // Add current word to local storage favorites
+        function addToFavorites() {
+            const exists = favorites.find(item => item.word === currentWordObj.word);
+            if (!exists) {
+                favorites.push(currentWordObj);
+                localStorage.setItem('lexicon_favorites', JSON.stringify(favorites));
+                renderFavorites();
+                showToast("Saved to favorites!");
+            } else {
+                showToast("Already in favorites!");
+            }
+        }
+
+        // Remove a word from favorites
+        function removeFavorite(word) {
+            favorites = favorites.filter(item => item.word !== word);
+            localStorage.setItem('lexicon_favorites', JSON.stringify(favorites));
+            renderFavorites();
+        }
+
+        // Render the favorites list in the DOM
+        function renderFavorites() {
+            const listElement = document.getElementById('favorites-list');
+            listElement.innerHTML = ''; // Clear current list
+            
+            if (favorites.length === 0) {
+                listElement.innerHTML = '<div style="text-align:center; color: #8e8e93; margin-top: 20px;">No favorites yet.</div>';
+                return;
+            }
+
+            favorites.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'fav-item';
+                li.innerHTML = `
+                    <div class="fav-item-text">
+                        <strong>${item.word}</strong>
+                        <span>${item.definition}</span>
+                    </div>
+                    <button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>
+                `;
+                listElement.appendChild(li);
+            });
+        }
+
+        // Switch between Discover and Favorites tabs
+        function switchTab(tabName) {
+            // Update Tab UI
+            document.getElementById('tab-discover').classList.remove('active');
+            document.getElementById('tab-favorites').classList.remove('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // Update Content UI
+            document.getElementById('view-discover').classList.remove('active');
+            document.getElementById('view-favorites').classList.remove('active');
+            document.getElementById('view-' + tabName).classList.add('active');
+        }
+
+        // Show a brief notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        // Run init on load
+        window.onload = init;
+    </script>
+</body>
+</html>
