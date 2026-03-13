@@ -9,7 +9,6 @@
     <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/180/007aff/v.png">
     <title>Vocab Expander</title>
     <style>
-        /* Modern, iOS-style CSS */
         :root {
             --bg-color: #f2f2f7;
             --card-bg: #ffffff;
@@ -35,9 +34,8 @@
             overflow: hidden;
         }
 
-        /* App Header */
         header {
-            padding: 50px 20px 20px 20px; /* Extra top padding for iPhone notch/Dynamic Island */
+            padding: 50px 20px 20px 20px;
             background-color: var(--card-bg);
             text-align: center;
             font-size: 24px;
@@ -45,19 +43,17 @@
             border-bottom: 1px solid #e5e5ea;
         }
 
-        /* Content Area */
         .content {
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
-            display: none; /* Hidden by default, toggled via JS */
+            display: none;
         }
 
         .content.active {
             display: block;
         }
 
-        /* Word Card */
         .card {
             background-color: var(--card-bg);
             border-radius: 16px;
@@ -79,9 +75,18 @@
             font-size: 18px;
             color: var(--text-muted);
             line-height: 1.5;
+            margin-bottom: 15px;
         }
 
-        /* Buttons */
+        /* Added style for the example sentence */
+        .word-sentence {
+            font-size: 16px;
+            color: var(--text-main);
+            font-style: italic;
+            border-top: 1px solid #f2f2f7;
+            padding-top: 15px;
+        }
+
         .btn {
             display: block;
             width: 100%;
@@ -109,12 +114,11 @@
             color: var(--accent);
         }
 
-        /* Favorites List */
-        .fav-list {
+        .list-container {
             list-style: none;
         }
 
-        .fav-item {
+        .list-item {
             background-color: var(--card-bg);
             padding: 16px;
             border-radius: 12px;
@@ -125,13 +129,13 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
 
-        .fav-item-text strong {
+        .list-item-text strong {
             display: block;
             font-size: 18px;
             margin-bottom: 4px;
         }
         
-        .fav-item-text span {
+        .list-item-text span {
             font-size: 14px;
             color: var(--text-muted);
         }
@@ -143,14 +147,14 @@
             font-weight: bold;
             font-size: 24px;
             cursor: pointer;
+            padding-left: 10px;
         }
 
-        /* Bottom Tab Bar */
         .tab-bar {
             display: flex;
             background-color: var(--card-bg);
             border-top: 1px solid #e5e5ea;
-            padding-bottom: 20px; /* Home indicator space */
+            padding-bottom: 20px;
         }
 
         .tab {
@@ -158,7 +162,7 @@
             padding: 16px;
             text-align: center;
             color: var(--text-muted);
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
         }
@@ -167,7 +171,6 @@
             color: var(--accent);
         }
 
-        /* Notifications */
         .toast {
             position: fixed;
             top: 20px;
@@ -188,426 +191,83 @@
 <body>
 
     <header>Vocab Expander</header>
-    <div id="toast" class="toast">Added to favorites!</div>
+    <div id="toast" class="toast">Added!</div>
 
     <div id="view-discover" class="content active">
         <div class="card">
             <div class="word-title" id="display-word">Loading...</div>
             <div class="word-def" id="display-def">...</div>
+            <div class="word-sentence" id="display-sentence">...</div>
         </div>
         <button class="btn btn-primary" onclick="generateWord()">Discover Another</button>
         <button class="btn btn-secondary" onclick="addToFavorites()">Save to Favorites</button>
     </div>
 
     <div id="view-favorites" class="content">
-        <ul class="fav-list" id="favorites-list">
-            </ul>
+        <ul class="list-container" id="favorites-list"></ul>
+    </div>
+
+    <div id="view-recents" class="content">
+        <ul class="list-container" id="recents-list"></ul>
     </div>
 
     <div class="tab-bar">
         <div class="tab active" id="tab-discover" onclick="switchTab('discover')">Discover</div>
+        <div class="tab" id="tab-recents" onclick="switchTab('recents')">Recents</div>
         <div class="tab" id="tab-favorites" onclick="switchTab('favorites')">Favorites</div>
     </div>
 
     <script>
-        // The dictionary of words
+        // Dictionary updated with sentences
         const dictionary = [
-            { word: "Aberration", definition: "A departure from what is normal or expected." },
-            { word: "Abstain", definition: "To restrain oneself from doing or enjoying something." },
-            { word: "Abstract", definition: "Existing in thought or as an idea but not having a physical existence." },
-            { word: "Acumen", definition: "The ability to make good judgments and quick decisions." },
-            { word: "Adherent", definition: "Someone who supports a particular party, person, or set of ideas." },
-            { word: "Admonish", definition: "To warn or reprimand someone firmly." },
-            { word: "Adroit", definition: "Clever or skillful in using the hands or mind." },
-            { word: "Adulation", definition: "Excessive admiration or praise." },
-            { word: "Adversity", definition: "Difficulties; misfortune." },
-            { word: "Advocate", definition: "A person who publicly supports or recommends a particular cause." },
-            { word: "Aesthetic", definition: "Concerned with beauty or the appreciation of beauty." },
-            { word: "Affable", definition: "Friendly, good-natured, or easy to talk to." },
-            { word: "Affluence", definition: "The state of having a great deal of money; wealth." },
-            { word: "Aggrandize", definition: "To increase the power, status, or wealth of." },
-            { word: "Alacrity", definition: "Brisk and cheerful readiness." },
-            { word: "Alleviate", definition: "To make suffering or a problem less severe." },
-            { word: "Ambiguous", definition: "Open to more than one interpretation; having a double meaning." },
-            { word: "Ambivalent", definition: "Having mixed feelings or contradictory ideas about something." },
-            { word: "Ameliorate", definition: "To make something bad better." },
-            { word: "Amiable", definition: "Having or displaying a friendly and pleasant manner." },
-            { word: "Anachronism", definition: "Something that belongs to a period other than that in which it exists." },
-            { word: "Analogous", definition: "Comparable in certain respects, typically in a way which makes clear the nature of the things compared." },
-            { word: "Annex", definition: "To add as an extra or subordinate part." },
-            { word: "Anomaly", definition: "Something that deviates from what is standard, normal, or expected." },
-            { word: "Antagonism", definition: "Active hostility or opposition." },
-            { word: "Apathetic", definition: "Showing or feeling no interest, enthusiasm, or concern." },
-            { word: "Appease", definition: "To pacify or placate someone by acceding to their demands." },
-            { word: "Arbitrary", definition: "Based on random choice or personal whim, rather than any reason or system." },
-            { word: "Archaic", definition: "Very old or old-fashioned." },
-            { word: "Ardent", definition: "Enthusiastic or passionate." },
-            { word: "Articulate", definition: "Having or showing the ability to speak fluently and coherently." },
-            { word: "Ascertain", definition: "To find something out for certain; make sure of." },
-            { word: "Asperity", definition: "Harshness of tone or manner." },
-            { word: "Assiduous", definition: "Showing great care and perseverance." },
-            { word: "Astute", definition: "Having or showing an ability to accurately assess situations." },
-            { word: "Atrophy", definition: "To gradually decline in effectiveness or vigor due to underuse or neglect." },
-            { word: "Attenuate", definition: "To reduce the force, effect, or value of." },
-            { word: "Audacious", definition: "Showing a willingness to take surprisingly bold risks." },
-            { word: "Augment", definition: "To make something greater by adding to it; increase." },
-            { word: "Austere", definition: "Severe or strict in manner, attitude, or appearance." },
-            { word: "Autonomous", definition: "Having the freedom to govern itself or control its own affairs." },
-            { word: "Avarice", definition: "Extreme greed for wealth or material gain." },
-            { word: "Aversion", definition: "A strong dislike or disinclination." },
-            { word: "Banal", definition: "So lacking in originality as to be obvious and boring." },
-            { word: "Belie", definition: "To fail to give a true notion or impression of something." },
-            { word: "Benevolent", definition: "Well meaning and kindly." },
-            { word: "Benign", definition: "Gentle and kindly; not harmful." },
-            { word: "Bolster", definition: "To support or strengthen; prop up." },
-            { word: "Bombastic", definition: "High-sounding but with little meaning; inflated." },
-            { word: "Brevity", definition: "Concise and exact use of words in writing or speech." },
-            { word: "Cajole", definition: "To persuade someone to do something by sustained coaxing or flattery." },
-            { word: "Candor", definition: "The quality of being open and honest in expression; frankness." },
-            { word: "Capricious", definition: "Given to sudden and unaccountable changes of mood or behavior." },
-            { word: "Castigate", definition: "To reprimand someone severely." },
-            { word: "Catalyst", definition: "A person or thing that precipitates an event." },
-            { word: "Caustic", definition: "Sarcastic in a scathing and bitter way." },
-            { word: "Censure", definition: "To express severe disapproval of someone or something." },
-            { word: "Chicanery", definition: "The use of trickery to achieve a political, financial, or legal purpose." },
-            { word: "Circumspect", definition: "Wary and unwilling to take risks." },
-            { word: "Clandestine", definition: "Kept secret or done secretively." },
-            { word: "Coalesce", definition: "To come together to form one mass or whole." },
-            { word: "Coercion", definition: "The practice of persuading someone to do something by using force or threats." },
-            { word: "Cognizant", definition: "Having knowledge or being aware of." },
-            { word: "Coherent", definition: "Logical and consistent." },
-            { word: "Colloquial", definition: "Used in ordinary or familiar conversation; not formal." },
-            { word: "Collusion", definition: "Secret or illegal cooperation or conspiracy." },
-            { word: "Complacent", definition: "Showing smug satisfaction with oneself or one's achievements." },
-            { word: "Compliant", definition: "Obeying, obliging, or yielding, especially in a submissive way." },
-            { word: "Conciliatory", definition: "Intended or likely to placate or pacify." },
-            { word: "Condone", definition: "To accept and allow behavior that is considered wrong to continue." },
-            { word: "Conducive", definition: "Making a certain situation or outcome likely or possible." },
-            { word: "Connoisseur", definition: "An expert judge in matters of taste." },
-            { word: "Consensus", definition: "A general agreement." },
-            { word: "Conspicuous", definition: "Standing out so as to be clearly visible." },
-            { word: "Constituent", definition: "Being a voting member of a community or organization." },
-            { word: "Construe", definition: "To interpret a word or action in a particular way." },
-            { word: "Contrived", definition: "Deliberately created rather than arising naturally." },
-            { word: "Conundrum", definition: "A confusing and difficult problem or question." },
-            { word: "Convergance", definition: "The process or state of converging." },
-            { word: "Convivial", definition: "Friendly, lively, and enjoyable." },
-            { word: "Copious", definition: "Abundant in supply or quantity." },
-            { word: "Corroborate", definition: "To confirm or give support to a statement or theory." },
-            { word: "Credulity", definition: "A tendency to be too ready to believe that something is real or true." },
-            { word: "Cryptic", definition: "Having a meaning that is mysterious or obscure." },
-            { word: "Culminate", definition: "To reach a climax or point of highest development." },
-            { word: "Culpable", definition: "Deserving blame." },
-            { word: "Cursory", definition: "Hasty and therefore not thorough or detailed." },
-            { word: "Curtail", definition: "To reduce in extent or quantity; impose a restriction on." },
-            { word: "Dearth", definition: "A scarcity or lack of something." },
-            { word: "Debilitate", definition: "To make someone very weak and infirm." },
-            { word: "Decorum", definition: "Behavior in keeping with good taste and propriety." },
-            { word: "Deferential", definition: "Showing humble submission and respect." },
-            { word: "Degradation", definition: "The condition or process of degrading or being degraded." },
-            { word: "Delineate", definition: "To describe or portray something precisely." },
-            { word: "Demure", definition: "Reserved, modest, and shy." },
-            { word: "Depict", definition: "To show or represent by a drawing, painting, or other art form." },
-            { word: "Deplore", definition: "To feel or express strong disapproval of." },
-            { word: "Deride", definition: "To express contempt for; ridicule." },
-            { word: "Derivative", definition: "Imitative of the work of another person, and usually disapproved of for that reason." },
-            { word: "Desiccated", definition: "Lacking interest, passion, or energy." },
-            { word: "Despondent", definition: "In low spirits from loss of hope or courage." },
-            { word: "Detrimental", definition: "Tending to cause harm." },
-            { word: "Devoid", definition: "Entirely lacking or free from." },
-            { word: "Diatribe", definition: "A forceful and bitter verbal attack against someone or something." },
-            { word: "Dichotomy", definition: "A division or contrast between two things that are represented as being opposed or entirely different." },
-            { word: "Didactic", definition: "Intended to teach, particularly in having moral instruction as an ulterior motive." },
-            { word: "Diffident", definition: "Modest or shy because of a lack of self-confidence." },
-            { word: "Digress", definition: "To leave the main subject temporarily in speech or writing." },
-            { word: "Dilatory", definition: "Slow to act." },
-            { word: "Discerning", definition: "Having or showing good judgment." },
-            { word: "Discordant", definition: "Disagreeing or incongruous." },
-            { word: "Discrepancy", definition: "An illogical or surprising lack of compatibility or similarity between two or more facts." },
-            { word: "Disdain", definition: "The feeling that someone or something is unworthy of one's consideration or respect." },
-            { word: "Disingenuous", definition: "Not candid or sincere, typically by pretending that one knows less about something than one really does." },
-            { word: "Disparage", definition: "To regard or represent as being of little worth." },
-            { word: "Disparity", definition: "A great difference." },
-            { word: "Disseminate", definition: "To spread or disperse something widely." },
-            { word: "Divergent", definition: "Tending to be different or develop in different directions." },
-            { word: "Dogmatic", definition: "Inclined to lay down principles as undeniably true." },
-            { word: "Dormant", definition: "Having normal physical functions suspended or slowed down for a period of time." },
-            { word: "Duplicity", definition: "Deceitfulness; double-dealing." },
-            { word: "Eclectic", definition: "Deriving ideas, style, or taste from a broad and diverse range of sources." },
-            { word: "Efficacy", definition: "The ability to produce a desired or intended result." },
-            { word: "Egregious", definition: "Outstandingly bad; shocking." },
-            { word: "Eloquence", definition: "Fluent or persuasive speaking or writing." },
-            { word: "Elucidate", definition: "To make something clear; explain." },
-            { word: "Elusive", definition: "Difficult to find, catch, or achieve." },
-            { word: "Embellish", definition: "To make something more attractive by the addition of decorative details." },
-            { word: "Empathy", definition: "The ability to understand and share the feelings of another." },
-            { word: "Emulate", definition: "To match or surpass a person or achievement, typically by imitation." },
-            { word: "Enervate", definition: "To cause someone to feel drained of energy or vitality." },
-            { word: "Engender", definition: "To cause or give rise to a feeling, situation, or condition." },
-            { word: "Enigma", definition: "A person or thing that is mysterious, puzzling, or difficult to understand." },
-            { word: "Ephemeral", definition: "Lasting for a very short time." },
-            { word: "Equanimity", definition: "Mental calmness, composure, and evenness of temper." },
-            { word: "Equivocal", definition: "Open to more than one interpretation; ambiguous." },
-            { word: "Erudite", definition: "Having or showing great knowledge or learning." },
-            { word: "Esoteric", definition: "Intended for or likely to be understood by only a small number of people with specialized knowledge." },
-            { word: "Euphemism", definition: "A mild or indirect word substituted for one considered to be too harsh or blunt." },
-            { word: "Exacerbate", definition: "To make a problem, bad situation, or negative feeling worse." },
-            { word: "Exacting", definition: "Making great demands on one's skill, attention, or other resources." },
-            { word: "Exculpate", definition: "To show or declare that someone is not guilty of wrongdoing." },
-            { word: "Exemplary", definition: "Serving as a desirable model; representing the best of its kind." },
-            { word: "Exonerate", definition: "To absolve someone from blame for a fault or wrongdoing." },
-            { word: "Exorbitant", definition: "Unreasonably high price or amount." },
-            { word: "Expedient", definition: "Convenient and practical although possibly improper or immoral." },
-            { word: "Explicit", definition: "Stated clearly and in detail, leaving no room for confusion or doubt." },
-            { word: "Extol", definition: "To praise enthusiastically." },
-            { word: "Extraneous", definition: "Irrelevant or unrelated to the subject being dealt with." },
-            { word: "Fabricate", definition: "To invent or concoct something, typically with deceitful intent." },
-            { word: "Facetious", definition: "Treating serious issues with deliberately inappropriate humor." },
-            { word: "Facilitate", definition: "To make an action or process easy or easier." },
-            { word: "Fallacious", definition: "Based on a mistaken belief." },
-            { word: "Fastidious", definition: "Very attentive to and concerned about accuracy and detail." },
-            { word: "Fathom", definition: "To understand a difficult problem or an enigmatic person after much thought." },
-            { word: "Fervent", definition: "Having or displaying a passionate intensity." },
-            { word: "Fickle", definition: "Changing frequently, especially as regards one's loyalties, interests, or affection." },
-            { word: "Fidelity", definition: "Faithfulness to a person, cause, or belief, demonstrated by continuing loyalty and support." },
-            { word: "Finesse", definition: "Intricate and refined delicacy." },
-            { word: "Flagrant", definition: "Conspicuously or obviously offensive." },
-            { word: "Flamboyant", definition: "Tending to attract attention because of their exuberance, confidence, and stylishness." },
-            { word: "Flippant", definition: "Not showing a serious or respectful attitude." },
-            { word: "Fortuitous", definition: "Happening by accident or chance rather than design." },
-            { word: "Frivolous", definition: "Not having any serious purpose or value." },
-            { word: "Frugal", definition: "Sparing or economical with regard to money or food." },
-            { word: "Furtive", definition: "Attempting to avoid notice or attention, typically because of guilt." },
-            { word: "Futile", definition: "Incapable of producing any useful result; pointless." },
-            { word: "Garrulous", definition: "Excessively talkative, especially on trivial matters." },
-            { word: "Gregarious", definition: "Fond of company; sociable." },
-            { word: "Guile", definition: "Sly or cunning intelligence." },
-            { word: "Gullible", definition: "Easily persuaded to believe something." },
-            { word: "Haphazard", definition: "Lacking any obvious principle of organization." },
-            { word: "Haughty", definition: "Arrogantly superior and disdainful." },
-            { word: "Hedonist", definition: "A person who believes that the pursuit of pleasure is the most important thing in life." },
-            { word: "Heinous", definition: "Utterly odious or wicked." },
-            { word: "Hypocrisy", definition: "The practice of claiming to have moral standards or beliefs to which one's own behavior does not conform." },
-            { word: "Idiosyncrasy", definition: "A mode of behavior or way of thought peculiar to an individual." },
-            { word: "Illicit", definition: "Forbidden by law, rules, or custom." },
-            { word: "Immaculate", definition: "Perfectly clean, neat, or tidy." },
-            { word: "Immutable", definition: "Unchanging over time or unable to be changed." },
-            { word: "Impartial", definition: "Treating all rivals or disputants equally; fair and just." },
-            { word: "Impecunious", definition: "Having little or no money." },
-            { word: "Impediment", definition: "A hindrance or obstruction in doing something." },
-            { word: "Imperative", definition: "Of vital importance; crucial." },
-            { word: "Impetuous", definition: "Acting or done quickly and without thought or care." },
-            { word: "Implicit", definition: "Implied though not plainly expressed." },
-            { word: "Imprudent", definition: "Not showing care for the consequences of an action; rash." },
-            { word: "Impunity", definition: "Exemption from punishment or freedom from the injurious consequences of an action." },
-            { word: "Inadvertent", definition: "Not resulting from or achieved through deliberate planning." },
-            { word: "Inane", definition: "Silly; stupid." },
-            { word: "Inarticulate", definition: "Unable to speak distinctly or express oneself clearly." },
-            { word: "Incessant", definition: "Continuing without pause or interruption." },
-            { word: "Incipient", definition: "In an initial stage; beginning to happen or develop." },
-            { word: "Incisive", definition: "Intelligently analytical and clear-thinking." },
-            { word: "Incongruous", definition: "Not in harmony or keeping with the surroundings or other aspects of something." },
-            { word: "Incorrigible", definition: "Not able to be corrected, improved, or reformed." },
-            { word: "Indifferent", definition: "Having no particular interest or sympathy; unconcerned." },
-            { word: "Indigenous", definition: "Originating or occurring naturally in a particular place; native." },
-            { word: "Indigent", definition: "Poor; needy." },
-            { word: "Indignant", definition: "Feeling or showing anger or annoyance at what is perceived as unfair treatment." },
-            { word: "Indolent", definition: "Wanting to avoid activity or exertion; lazy." },
-            { word: "Ineffable", definition: "Too great or extreme to be expressed or described in words." },
-            { word: "Inert", definition: "Lacking the ability or strength to move." },
-            { word: "Inevitable", definition: "Certain to happen; unavoidable." },
-            { word: "Infallible", definition: "Incapable of making mistakes or being wrong." },
-            { word: "Inherent", definition: "Existing in something as a permanent, essential, or characteristic attribute." },
-            { word: "Inhibiting", definition: "Hindering, restraining, or preventing an action or process." },
-            { word: "Innocuous", definition: "Not harmful or offensive." },
-            { word: "Inordinate", definition: "Unusually or disproportionately large; excessive." },
-            { word: "Insatiable", definition: "Impossible to satisfy." },
-            { word: "Inscrutable", definition: "Impossible to understand or interpret." },
-            { word: "Insidious", definition: "Proceeding in a gradual, subtle way, but with harmful effects." },
-            { word: "Insolent", definition: "Showing a rude and arrogant lack of respect." },
-            { word: "Instigate", definition: "To bring about or initiate an action or event." },
-            { word: "Intangible", definition: "Unable to be touched or grasped; not having physical presence." },
-            { word: "Integrity", definition: "The quality of being honest and having strong moral principles." },
-            { word: "Intermittent", definition: "Occurring at irregular intervals; not continuous or steady." },
-            { word: "Intractable", definition: "Hard to control or deal with." },
-            { word: "Intransigent", definition: "Unwilling or refusing to change one's views or to agree about something." },
-            { word: "Intrepid", definition: "Fearless; adventurous." },
-            { word: "Inundate", definition: "To overwhelm someone with things or people to be dealt with." },
-            { word: "Inure", definition: "To accustom someone to something, especially something unpleasant." },
-            { word: "Irascible", definition: "Having or showing a tendency to be easily angered." },
-            { word: "Irreproachable", definition: "Beyond criticism; faultless." },
-            { word: "Judicious", definition: "Having, showing, or done with good judgment or sense." },
-            { word: "Juxtaposition", definition: "The fact of two things being seen or placed close together with contrasting effect." },
-            { word: "Laconic", definition: "Using very few words." },
-            { word: "Lament", definition: "A passionate expression of grief or sorrow." },
-            { word: "Languid", definition: "Displaying or having a disinclination for physical exertion or effort; slow and relaxed." },
-            { word: "Latent", definition: "Existing but not yet developed or manifest; hidden; concealed." },
-            { word: "Laudable", definition: "Deserving praise and commendation." },
-            { word: "Lethargic", definition: "Affected by lethargy; sluggish and apathetic." },
-            { word: "Levity", definition: "Humor or frivolity, especially the treatment of a serious matter with humor." },
-            { word: "Loquacious", definition: "Tending to talk a great deal; talkative." },
-            { word: "Lucid", definition: "Expressed clearly; easy to understand." },
-            { word: "Magnanimous", definition: "Generous or forgiving, especially toward a rival or less powerful person." },
-            { word: "Malevolent", definition: "Having or showing a wish to do evil to others." },
-            { word: "Malleable", definition: "Easily influenced; pliable." },
-            { word: "Meticulous", definition: "Showing great attention to detail; very careful and precise." },
-            { word: "Mitigate", definition: "To make less severe, serious, or painful." },
-            { word: "Mollify", definition: "To appease the anger or anxiety of someone." },
-            { word: "Morose", definition: "Sullen and ill-tempered." },
-            { word: "Mundane", definition: "Lacking interest or excitement; dull." },
-            { word: "Munificent", definition: "Larger or more generous than is usual or necessary." },
-            { word: "Nefarious", definition: "Wicked or criminal." },
-            { word: "Negligible", definition: "So small or unimportant as to be not worth considering; insignificant." },
-            { word: "Nonchalant", definition: "Feeling or appearing casually calm and relaxed." },
-            { word: "Novel", definition: "New or unusual in an interesting way." },
-            { word: "Obdurate", definition: "Stubbornly refusing to change one's opinion or course of action." },
-            { word: "Oblivious", definition: "Not aware of or not concerned about what is happening around one." },
-            { word: "Obscure", definition: "Not discovered or known about; uncertain." },
-            { word: "Obsequious", definition: "Obedient or attentive to an excessive or servile degree." },
-            { word: "Obstinate", definition: "Stubbornly refusing to change one's opinion or chosen course of action." },
-            { word: "Obviate", definition: "To remove a need or difficulty." },
-            { word: "Ominous", definition: "Giving the impression that something bad or unpleasant is going to happen." },
-            { word: "Opaque", definition: "Not able to be seen through; not transparent." },
-            { word: "Opportunist", definition: "A person who exploits circumstances to gain immediate advantage." },
-            { word: "Opulence", definition: "Great wealth or luxuriousness." },
-            { word: "Ostentatious", definition: "Characterized by vulgar or pretentious display." },
-            { word: "Palliate", definition: "To make a disease or its symptoms less severe or unpleasant without removing the cause." },
-            { word: "Paradigm", definition: "A typical example or pattern of something; a model." },
-            { word: "Paroxysm", definition: "A sudden attack or violent expression of a particular emotion or activity." },
-            { word: "Parsimony", definition: "Extreme unwillingness to spend money or use resources." },
-            { word: "Paucity", definition: "The presence of something only in small or insufficient quantities or amounts." },
-            { word: "Pedantic", definition: "Excessively concerned with minor details and rules." },
-            { word: "Pejorative", definition: "Expressing contempt or disapproval." },
-            { word: "Penchant", definition: "A strong or habitual liking for something or tendency to do something." },
-            { word: "Pensive", definition: "Engaged in, involving, or reflecting deep or serious thought." },
-            { word: "Perfunctory", definition: "Carried out with a minimum of effort or reflection." },
-            { word: "Permeate", definition: "To spread throughout something." },
-            { word: "Pernicious", definition: "Having a harmful effect, especially in a gradual or subtle way." },
-            { word: "Perpetuate", definition: "To make something continue indefinitely." },
-            { word: "Perspicacious", definition: "Having a ready insight into and understanding of things." },
-            { word: "Pertinent", definition: "Relevant or applicable to a particular matter." },
-            { word: "Pervasive", definition: "Spreading widely throughout an area or a group of people." },
-            { word: "Pious", definition: "Devoutly religious." },
-            { word: "Placate", definition: "To make someone less angry or hostile." },
-            { word: "Platitude", definition: "A remark or statement, especially one with a moral content, that has been used too often to be interesting." },
-            { word: "Plausible", definition: "Seeming reasonable or probable." },
-            { word: "Plethora", definition: "A large or excessive amount of something." },
-            { word: "Pragmatic", definition: "Dealing with things sensibly and realistically." },
-            { word: "Pre-eminence", definition: "The fact of surpassing all others; superiority." },
-            { word: "Precarious", definition: "Not securely held or in position; dangerously likely to fall or collapse." },
-            { word: "Preclude", definition: "To prevent from happening; make impossible." },
-            { word: "Precocious", definition: "Having developed certain abilities or proclivities at an earlier age than usual." },
-            { word: "Predilection", definition: "A preference or special liking for something; a bias in favor of something." },
-            { word: "Presumptuous", definition: "Failing to observe the limits of what is permitted or appropriate." },
-            { word: "Pretentious", definition: "Attempting to impress by affecting greater importance than is actually possessed." },
-            { word: "Prevalent", definition: "Widespread in a particular area or at a particular time." },
-            { word: "Pristine", definition: "In its original condition; unspoiled." },
-            { word: "Proclivity", definition: "A tendency to choose or do something regularly." },
-            { word: "Prodigious", definition: "Remarkably or impressively great in extent, size, or degree." },
-            { word: "Profane", definition: "Relating or devoted to that which is not sacred or biblical." },
-            { word: "Profound", definition: "Very great or intense." },
-            { word: "Prolific", definition: "Producing much fruit or foliage or many offspring." },
-            { word: "Propensity", definition: "An inclination or natural tendency to behave in a particular way." },
-            { word: "Propriety", definition: "The state or quality of conforming to conventionally accepted standards of behavior or morals." },
-            { word: "Prosaic", definition: "Having the style or diction of prose; lacking poetic beauty." },
-            { word: "Prudent", definition: "Acting with or showing care and thought for the future." },
-            { word: "Pugnacious", definition: "Eager or quick to argue, quarrel, or fight." },
-            { word: "Punctilious", definition: "Showing great attention to detail or correct behavior." },
-            { word: "Qualm", definition: "An uneasy feeling of doubt, worry, or fear, especially about one's own conduct." },
-            { word: "Quandary", definition: "A state of perplexity or uncertainty over what to do in a difficult situation." },
-            { word: "Quiescent", definition: "In a state or period of inactivity or dormancy." },
-            { word: "Rancor", definition: "Bitterness or resentfulness, especially when long-standing." },
-            { word: "Ratify", definition: "To sign or give formal consent to a treaty, contract, or agreement." },
-            { word: "Raucous", definition: "Making or constituting a disturbingly harsh and loud noise." },
-            { word: "Recalcitrant", definition: "Having an obstinately uncooperative attitude toward authority or discipline." },
-            { word: "Reciprocal", definition: "Given, felt, or done in return." },
-            { word: "Reclusive", definition: "Avoiding the company of other people; solitary." },
-            { word: "Recondite", definition: "Little known; abstruse." },
-            { word: "Rectify", definition: "To put something right; correct." },
-            { word: "Redundant", definition: "Not or no longer needed or useful; superfluous." },
-            { word: "Refute", definition: "To prove a statement or theory to be wrong or false; disprove." },
-            { word: "Reiterate", definition: "To say something again or a number of times, typically for emphasis or clarity." },
-            { word: "Relinquish", definition: "To voluntarily cease to keep or claim; give up." },
-            { word: "Remiss", definition: "Lacking care or attention to duty; negligent." },
-            { word: "Remonstrate", definition: "To make a forcefully reproachful protest." },
-            { word: "Renounce", definition: "To formally declare one's abandonment of a claim, right, or possession." },
-            { word: "Reprehensible", definition: "Deserving censure or condemnation." },
-            { word: "Repudiate", definition: "To refuse to accept or be associated with." },
-            { word: "Rescind", definition: "To revoke, cancel, or repeal a law, order, or agreement." },
-            { word: "Resilient", definition: "Able to withstand or recover quickly from difficult conditions." },
-            { word: "Reticent", definition: "Not revealing one's thoughts or feelings readily." },
-            { word: "Reverence", definition: "Deep respect for someone or something." },
-            { word: "Rhetoric", definition: "The art of effective or persuasive speaking or writing." },
-            { word: "Robust", definition: "Strong and healthy; vigorous." },
-            { word: "Rudimentary", definition: "Involving or limited to basic principles." },
-            { word: "Sagacious", definition: "Having or showing keen mental discernment and good judgment." },
-            { word: "Salient", definition: "Most noticeable or important." },
-            { word: "Sanction", definition: "A threatened penalty for disobeying a law or rule." },
-            { word: "Sanguine", definition: "Optimistic or positive, especially in an apparently bad or difficult situation." },
-            { word: "Scrupulous", definition: "Diligent, thorough, and extremely attentive to details." },
-            { word: "Scrutinize", definition: "To examine or inspect closely and thoroughly." },
-            { word: "Serendipity", definition: "The occurrence and development of events by chance in a happy or beneficial way." },
-            { word: "Servile", definition: "Having or showing an excessive willingness to serve or please others." },
-            { word: "Solace", definition: "Comfort or consolation in a time of distress or sadness." },
-            { word: "Solicitous", definition: "Showing interest or concern." },
-            { word: "Sophistry", definition: "The use of fallacious arguments, especially with the intention of deceiving." },
-            { word: "Soporific", definition: "Tending to induce drowsiness or sleep." },
-            { word: "Spurious", definition: "Not being what it purports to be; false or fake." },
-            { word: "Stoic", definition: "A person who can endure pain or hardship without showing their feelings or complaining." },
-            { word: "Stringent", definition: "Strict, precise, and exacting." },
-            { word: "Substantiate", definition: "To provide evidence to support or prove the truth of." },
-            { word: "Subtle", definition: "So delicate or precise as to be difficult to analyze or describe." },
-            { word: "Succinct", definition: "Briefly and clearly expressed." },
-            { word: "Superfluous", definition: "Unnecessary, especially through being more than enough." },
-            { word: "Surreptitious", definition: "Kept secret, especially because it would not be approved of." },
-            { word: "Sycophant", definition: "A person who acts obsequiously toward someone important in order to gain advantage." },
-            { word: "Tacit", definition: "Understood or implied without being stated." },
-            { word: "Taciturn", definition: "Reserved or uncommunicative in speech; saying little." },
-            { word: "Tangible", definition: "Perceptible by touch." },
-            { word: "Tenuous", definition: "Very weak or slight." },
-            { word: "Terse", definition: "Sparing in the use of words; abrupt." },
-            { word: "Thwart", definition: "To prevent someone from accomplishing something." },
-            { word: "Tractable", definition: "Easy to control or influence." },
-            { word: "Transient", definition: "Lasting only for a short time; impermanent." },
-            { word: "Trepidation", definition: "A feeling of fear or agitation about something that may happen." },
-            { word: "Trite", definition: "Overused and consequently of little import; lacking originality." },
-            { word: "Truncate", definition: "To shorten something by cutting off the top or the end." },
-            { word: "Ubiquitous", definition: "Present, appearing, or found everywhere." },
-            { word: "Unequivocal", definition: "Leaving no doubt; unambiguous." },
-            { word: "Untenable", definition: "Not able to be maintained or defended against attack or objection." },
-            { word: "Vacillate", definition: "To alternate or waver between different opinions or actions; be indecisive." },
-            { word: "Venerate", definition: "To regard with great respect; revere." },
-            { word: "Veracity", definition: "Conformity to facts; accuracy." },
-            { word: "Verbose", definition: "Using or expressed in more words than are needed." },
-            { word: "Viable", definition: "Capable of working successfully; feasible." },
-            { word: "Vindicate", definition: "To clear someone of blame or suspicion." },
-            { word: "Virulent", definition: "Extremely severe or harmful in its effects." },
-            { word: "Vituperative", definition: "Bitter and abusive." },
-            { word: "Volatile", definition: "Liable to change rapidly and unpredictably, especially for the worse." },
-            { word: "Wary", definition: "Feeling or showing caution about possible dangers or problems." },
-            { word: "Wily", definition: "Skilled at gaining an advantage, especially deceitfully." },
-            { word: "Zealous", definition: "Showing great energy or enthusiasm in pursuit of a cause or an objective." },
-            { word: "Zenith", definition: "The time at which something is most powerful or successful." }
+            { word: "Aberration", definition: "A departure from what is normal or expected.", sentence: "The sudden snowstorm in July was a total aberration." },
+            { word: "Alacrity", definition: "Brisk and cheerful readiness.", sentence: "She accepted the job offer with alacrity." },
+            { word: "Anachronism", definition: "Something that belongs to a different period.", sentence: "The digital watch in the medieval movie was a clear anachronism." },
+            { word: "Banal", definition: "So lacking in originality as to be boring.", sentence: "He made some banal remarks about the weather." },
+            { word: "Candor", definition: "The quality of being open and honest.", sentence: "I appreciate your candor regarding the situation." },
+            { word: "Enigma", definition: "A person or thing that is mysterious or puzzling.", sentence: "How the magician pulled off the trick remains an enigma." },
+            { word: "Ephemeral", definition: "Lasting for a very short time.", sentence: "The beauty of a sunset is breathtaking but ephemeral." },
+            { word: "Loquacious", definition: "Tending to talk a great deal.", sentence: "The loquacious presenter ran over his allotted time." },
+            { word: "Meticulous", definition: "Showing great attention to detail.", sentence: "He was meticulous about keeping his desk organized." },
+            { word: "Serendipity", definition: "Finding valuable things by luck.", sentence: "Meeting my old friend at the airport was pure serendipity." }
+            // Note: Add sentences to the rest of your dictionary as you grow it!
         ];
 
         let currentWordObj = {};
         let favorites = JSON.parse(localStorage.getItem('lexicon_favorites')) || [];
+        let recents = JSON.parse(localStorage.getItem('lexicon_recents')) || [];
 
-        // App Initialization
         function init() {
             generateWord();
             renderFavorites();
+            renderRecents();
         }
 
-        // Generate a random word from the dictionary
         function generateWord() {
             const randomIndex = Math.floor(Math.random() * dictionary.length);
             currentWordObj = dictionary[randomIndex];
+            
             document.getElementById('display-word').innerText = currentWordObj.word;
             document.getElementById('display-def').innerText = currentWordObj.definition;
+            
+            // Display sentence (or a default if missing)
+            document.getElementById('display-sentence').innerText = currentWordObj.sentence ? `"${currentWordObj.sentence}"` : "No example sentence available.";
+
+            addToRecents(currentWordObj);
         }
 
-        // Add current word to local storage favorites
+        function addToRecents(wordObj) {
+            // Remove if already exists to move it to the top
+            recents = recents.filter(item => item.word !== wordObj.word);
+            // Add to the beginning of the array
+            recents.unshift(wordObj);
+            // Limit to top 20
+            if (recents.length > 20) recents.pop();
+            
+            localStorage.setItem('lexicon_recents', JSON.stringify(recents));
+            renderRecents();
+        }
+
         function addToFavorites() {
             const exists = favorites.find(item => item.word === currentWordObj.word);
             if (!exists) {
@@ -620,61 +280,63 @@
             }
         }
 
-        // Remove a word from favorites
         function removeFavorite(word) {
             favorites = favorites.filter(item => item.word !== word);
             localStorage.setItem('lexicon_favorites', JSON.stringify(favorites));
             renderFavorites();
         }
 
-        // Render the favorites list in the DOM
         function renderFavorites() {
-            const listElement = document.getElementById('favorites-list');
-            listElement.innerHTML = ''; // Clear current list
+            renderGenericList('favorites-list', favorites, true);
+        }
+
+        function renderRecents() {
+            renderGenericList('recents-list', recents, false);
+        }
+
+        // Shared function to render lists
+        function renderGenericList(elementId, dataArray, isDeletable) {
+            const listElement = document.getElementById(elementId);
+            listElement.innerHTML = '';
             
-            if (favorites.length === 0) {
-                listElement.innerHTML = '<div style="text-align:center; color: #8e8e93; margin-top: 20px;">No favorites yet.</div>';
+            if (dataArray.length === 0) {
+                listElement.innerHTML = `<div style="text-align:center; color: #8e8e93; margin-top: 20px;">Empty list.</div>`;
                 return;
             }
 
-            favorites.forEach(item => {
+            dataArray.forEach(item => {
                 const li = document.createElement('li');
-                li.className = 'fav-item';
+                li.className = 'list-item';
                 li.innerHTML = `
-                    <div class="fav-item-text">
+                    <div class="list-item-text">
                         <strong>${item.word}</strong>
                         <span>${item.definition}</span>
                     </div>
-                    <button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>
+                    ${isDeletable ? `<button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>` : ''}
                 `;
                 listElement.appendChild(li);
             });
         }
 
-        // Switch between Discover and Favorites tabs
         function switchTab(tabName) {
-            // Update Tab UI
-            document.getElementById('tab-discover').classList.remove('active');
-            document.getElementById('tab-favorites').classList.remove('active');
-            document.getElementById('tab-' + tabName).classList.add('active');
+            // Reset all tabs/views
+            ['discover', 'favorites', 'recents'].forEach(t => {
+                document.getElementById('tab-' + t).classList.remove('active');
+                document.getElementById('view-' + t).classList.remove('active');
+            });
 
-            // Update Content UI
-            document.getElementById('view-discover').classList.remove('active');
-            document.getElementById('view-favorites').classList.remove('active');
+            // Set active
+            document.getElementById('tab-' + tabName).classList.add('active');
             document.getElementById('view-' + tabName).classList.add('active');
         }
 
-        // Show a brief notification
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.innerText = message;
             toast.style.opacity = '1';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 2000);
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
 
-        // Run init on load
         window.onload = init;
     </script>
 </body>
