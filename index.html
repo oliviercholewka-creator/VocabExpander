@@ -204,8 +204,7 @@
         <div class="tab" id="tab-quiz" onclick="switchTab('quiz')">Quiz</div>
     </div>
 
-    <script src="dictionary.js"></script>
-    <script>
+    <script src="dictionary.js">
         let currentWordObj = {};
         let favorites = JSON.parse(localStorage.getItem('lexicon_favorites')) || [];
         let recents = JSON.parse(localStorage.getItem('lexicon_recents')) || [];
