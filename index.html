@@ -186,6 +186,31 @@
             pointer-events: none;
             z-index: 1000;
         }
+        .fav-btn-small {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        /* On mobile, hide the text and just show the star */
+        @media (max-width: 480px) {
+            .fav-btn-small span {
+                display: none;
+            }
+            .fav-btn-small::before {
+                content: "★";
+                font-size: 18px;
+            }
+            .fav-btn-small {
+                padding: 5px 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -555,71 +580,71 @@
             { word: "Reciprocal", definition: "Given, felt, or done in return.", sentence: "The two countries have a reciprocal agreement regarding trade and travel." },
             { word: "Reclusive", definition: "Avoiding the company of other people; solitary.", sentence: "The reclusive author lived alone in a small cabin in the woods." },
             { word: "Recondite", definition: "Little known; abstruse.", sentence: "The professor's lecture covered recondite aspects of ancient Greek philosophy." },
-             { word: "Rectify", definition: "To put something right; correct.", sentence: "The company took immediate steps to rectify the error in the customer's billing." },
-             { word: "Redundant", definition: "Not or no longer needed or useful; superfluous.", sentence: "Modern technology has made many old industrial processes redundant." },
-             { word: "Refute", definition: "To prove a statement or theory to be wrong or false; disprove.", sentence: "The scientist published a paper to refute the existing theory with new data." },
-             { word: "Reiterate", definition: "To say something again or a number of times, typically for emphasis or clarity.", sentence: "Let me reiterate that safety is our absolute top priority during this exercise." },
-             { word: "Relinquish", definition: "To voluntarily cease to keep or claim; give up.", sentence: "He was forced to relinquish his position on the board due to a conflict of interest." },
-             { word: "Remiss", definition: "Lacking care or attention to duty; negligent.", sentence: "I would be remiss if I didn't thank everyone who helped make this event a success." },
-             { word: "Remonstrate", definition: "To make a forcefully reproachful protest.", sentence: "The players gathered to remonstrate with the referee about the controversial call." },
-             { word: "Renounce", definition: "To formally declare one's abandonment of a claim, right, or possession.", sentence: "The prince chose to renounce his claim to the throne to marry for love." },
-             { word: "Reprehensible", definition: "Deserving censure or condemnation.", sentence: "The judge described the defendant's lack of remorse as utterly reprehensible." },
-             { word: "Repudiate", definition: "To refuse to accept or be associated with.", sentence: "The candidate was quick to repudiate the extremist views of some of his supporters." },
-             { word: "Rescind", definition: "To revoke, cancel, or repeal a law, order, or agreement.", sentence: "The government eventually decided to rescind the unpopular tax increase." },
-             { word: "Resilient", definition: "Able to withstand or recover quickly from difficult conditions.", sentence: "Local businesses proved to be resilient despite the long economic downturn." },
-             { word: "Reticent", definition: "Not revealing one's thoughts or feelings readily.", sentence: "She was reticent about her personal life, preferring to keep it private." },
-             { word: "Reverence", definition: "Deep respect for someone or something.", sentence: "The students treated the elderly monk with a great deal of reverence." },
-             { word: "Rhetoric", definition: "The art of effective or persuasive speaking or writing.", sentence: "Behind all the political rhetoric, there were very few concrete policy proposals." },
-             { word: "Robust", definition: "Strong and healthy; vigorous.", sentence: "The company reported robust sales growth in its first quarter." },
-             { word: "Rudimentary", definition: "Involving or limited to basic principles.", sentence: "He has only a rudimentary knowledge of French, but he can manage a basic conversation." },
-             { word: "Sagacious", definition: "Having or showing keen mental discernment and good judgment.", sentence: "The president relied on the sagacious advice of her most experienced counselors." },
-             { word: "Salient", definition: "Most noticeable or important.", sentence: "The salient point of his argument was that the project would cost more than expected." },
-             { word: "Sanction", definition: "A threatened penalty for disobeying a law or rule.", sentence: "The international community voted to impose a trade sanction against the aggressor." },
-             { word: "Sanguine", definition: "Optimistic or positive, especially in an apparently bad or difficult situation.", sentence: "Despite the early setbacks, he remained sanguine about the team's chances." },
-             { word: "Scrupulous", definition: "Diligent, thorough, and extremely attentive to details.", sentence: "The research was conducted with scrupulous attention to scientific protocols." },
-             { word: "Scrutinize", definition: "To examine or inspect closely and thoroughly.", sentence: "Customs officials began to scrutinize every bag coming off the international flight." },
-             { word: "Serendipity", definition: "The occurrence and development of events by chance in a happy or beneficial way.", sentence: "Finding my future business partner at a random coffee shop was pure serendipity." },
-             { word: "Servile", definition: "Having or showing an excessive willingness to serve or please others.", sentence: "He was annoyed by the servile attitude of the assistants who never disagreed with him." },
-             { word: "Solace", definition: "Comfort or consolation in a time of distress or sadness.", sentence: "She found solace in her music after the loss of her grandmother." },
-             { word: "Solicitous", definition: "Showing interest or concern.", sentence: "The hotel staff was incredibly solicitous, ensuring we had everything we needed." },
-             { word: "Sophistry", definition: "The use of fallacious arguments, especially with the intention of deceiving.", sentence: "The lawyer’s argument was a clever piece of sophistry designed to confuse the jury." },
-             { word: "Soporific", definition: "Tending to induce drowsiness or sleep.", sentence: "The motion of the train had a soporific effect, and I soon drifted off." },
-             { word: "Spurious", definition: "Not being what it purports to be; false or fake.", sentence: "The museum realized the painting was a spurious imitation and removed it from display." },
-             { word: "Stoic", definition: "A person who can endure pain or hardship without showing their feelings.", sentence: "He remained stoic throughout the long recovery process, never once complaining." },
-             { word: "Stringent", definition: "Strict, precise, and exacting.", sentence: "The university has very stringent requirements for admission to its medical school." },
-             { word: "Substantiate", definition: "To provide evidence to support or prove the truth of.", sentence: "There is currently no evidence to substantiate the claims made in the anonymous letter." },
-             { word: "Subtle", definition: "So delicate or precise as to be difficult to analyze or describe.", sentence: "The chef added a subtle hint of saffron to the sauce to enhance the flavor." },
-             { word: "Succinct", definition: "Briefly and clearly expressed.", sentence: "Her report was succinct and to the point, making it very easy to read." },
-             { word: "Superfluous", definition: "Unnecessary, especially through being more than enough.", sentence: "The extra explanation was superfluous since everyone already understood the plan." },
-             { word: "Surreptitious", definition: "Kept secret, especially because it would not be approved of.", sentence: "He took a surreptitious peek at his birthday presents hidden in the closet." },
-             { word: "Sycophant", definition: "A person who acts obsequiously toward someone important in order to gain advantage.", sentence: "The CEO was surrounded by sycophants who never challenged his bad decisions." },
-             { word: "Tacit", definition: "Understood or implied without being stated.", sentence: "By not objecting, the committee gave its tacit approval to the new project." },
-             { word: "Taciturn", definition: "Reserved or uncommunicative in speech; saying little.", sentence: "The shy boy was taciturn by nature, rarely speaking unless spoken to." },
-             { word: "Tangible", definition: "Perceptible by touch.", sentence: "The atmosphere of excitement in the stadium was almost tangible." },
-             { word: "Tenuous", definition: "Very weak or slight.", sentence: "The police have only a tenuous link between the suspect and the crime scene." },
-             { word: "Terse", definition: "Sparing in the use of words; abrupt.", sentence: "He gave a terse one-word answer that made it clear he was angry." },
-             { word: "Thwart", definition: "To prevent someone from accomplishing something.", sentence: "The security guards were able to thwart the attempted robbery." },
-             { word: "Tractable", definition: "Easy to control or influence.", sentence: "The dog was very tractable and learned new tricks within minutes." },
-             { word: "Transient", definition: "Lasting only for a short time; impermanent.", sentence: "The joy of winning was transient, soon replaced by the pressure of the next game." },
-             { word: "Trepidation", definition: "A feeling of fear or agitation about something that may happen.", sentence: "She entered the boss's office with a great deal of trepidation." },
-             { word: "Trite", definition: "Overused and consequently of little import; lacking originality.", sentence: "The movie was full of trite dialogue and predictable plot twists." },
-             { word: "Truncate", definition: "To shorten something by cutting off the top or the end.", sentence: "Because of the time limit, the speaker had to truncate her final presentation." },
-             { word: "Ubiquitous", definition: "Present, appearing, or found everywhere.", sentence: "Mobile phones have become ubiquitous in modern society." },
-             { word: "Unequivocal", definition: "Leaving no doubt; unambiguous.", sentence: "The lab results provided unequivocal proof of the patient's recovery." },
-             { word: "Untenable", definition: "Not able to be maintained or defended against attack or objection.", sentence: "The general realized their position on the hill was untenable and ordered a retreat." },
-             { word: "Vacillate", definition: "To alternate or waver between different opinions or actions.", sentence: "You cannot afford to vacillate when a quick decision is required." },
-             { word: "Venerate", definition: "To regard with great respect; revere.", sentence: "In many cultures, it is traditional to venerate one's ancestors." },
-             { word: "Veracity", definition: "Conformity to facts; accuracy.", sentence: "Officials began to doubt the veracity of the witness's testimony." },
-             { word: "Verbose", definition: "Using or expressed in more words than are needed.", sentence: "His verbose style of writing made even a simple email three pages long." },
-             { word: "Viable", definition: "Capable of working successfully; feasible.", sentence: "The committee is looking for a viable solution that fits within the budget." },
-             { word: "Vindicate", definition: "To clear someone of blame or suspicion.", sentence: "The new evidence will finally vindicate him after years of being wrongly accused." },
-             { word: "Virulent", definition: "Extremely severe or harmful in its effects.", sentence: "The city was hit by a particularly virulent strain of the flu." },
-             { word: "Vituperative", definition: "Bitter and abusive.", sentence: "The politician launched a vituperative attack on his opponent during the debate." },
-             { word: "Volatile", definition: "Liable to change rapidly and unpredictably.", sentence: "The political situation in the region remains highly volatile." },
-             { word: "Wary", definition: "Feeling or showing caution about possible dangers or problems.", sentence: "Experienced hikers are always wary of sudden changes in mountain weather." },
-             { word: "Wily", definition: "Skilled at gaining an advantage, especially deceitfully.", sentence: "The wily fox managed to escape the hunters once again." },
-             { word: "Zealous", definition: "Showing great energy or enthusiasm in pursuit of a cause.", sentence: "She is a zealous supporter of the local animal shelter." },
-             { word: "Zenith", definition: "The time at which something is most powerful or successful.", sentence: "The Roman Empire reached its zenith during the second century AD." }
+            { word: "Rectify", definition: "To put something right; correct.", sentence: "The company took immediate steps to rectify the error in the customer's billing." },
+            { word: "Redundant", definition: "Not or no longer needed or useful; superfluous.", sentence: "Modern technology has made many old industrial processes redundant." },
+            { word: "Refute", definition: "To prove a statement or theory to be wrong or false; disprove.", sentence: "The scientist published a paper to refute the existing theory with new data." },
+            { word: "Reiterate", definition: "To say something again or a number of times, typically for emphasis or clarity.", sentence: "Let me reiterate that safety is our absolute top priority during this exercise." },
+            { word: "Relinquish", definition: "To voluntarily cease to keep or claim; give up.", sentence: "He was forced to relinquish his position on the board due to a conflict of interest." },
+            { word: "Remiss", definition: "Lacking care or attention to duty; negligent.", sentence: "I would be remiss if I didn't thank everyone who helped make this event a success." },
+            { word: "Remonstrate", definition: "To make a forcefully reproachful protest.", sentence: "The players gathered to remonstrate with the referee about the controversial call." },
+            { word: "Renounce", definition: "To formally declare one's abandonment of a claim, right, or possession.", sentence: "The prince chose to renounce his claim to the throne to marry for love." },
+            { word: "Reprehensible", definition: "Deserving censure or condemnation.", sentence: "The judge described the defendant's lack of remorse as utterly reprehensible." },
+            { word: "Repudiate", definition: "To refuse to accept or be associated with.", sentence: "The candidate was quick to repudiate the extremist views of some of his supporters." },
+            { word: "Rescind", definition: "To revoke, cancel, or repeal a law, order, or agreement.", sentence: "The government eventually decided to rescind the unpopular tax increase." },
+            { word: "Resilient", definition: "Able to withstand or recover quickly from difficult conditions.", sentence: "Local businesses proved to be resilient despite the long economic downturn." },
+            { word: "Reticent", definition: "Not revealing one's thoughts or feelings readily.", sentence: "She was reticent about her personal life, preferring to keep it private." },
+            { word: "Reverence", definition: "Deep respect for someone or something.", sentence: "The students treated the elderly monk with a great deal of reverence." },
+            { word: "Rhetoric", definition: "The art of effective or persuasive speaking or writing.", sentence: "Behind all the political rhetoric, there were very few concrete policy proposals." },
+            { word: "Robust", definition: "Strong and healthy; vigorous.", sentence: "The company reported robust sales growth in its first quarter." },
+            { word: "Rudimentary", definition: "Involving or limited to basic principles.", sentence: "He has only a rudimentary knowledge of French, but he can manage a basic conversation." },
+            { word: "Sagacious", definition: "Having or showing keen mental discernment and good judgment.", sentence: "The president relied on the sagacious advice of her most experienced counselors." },
+            { word: "Salient", definition: "Most noticeable or important.", sentence: "The salient point of his argument was that the project would cost more than expected." },
+            { word: "Sanction", definition: "A threatened penalty for disobeying a law or rule.", sentence: "The international community voted to impose a trade sanction against the aggressor." },
+            { word: "Sanguine", definition: "Optimistic or positive, especially in an apparently bad or difficult situation.", sentence: "Despite the early setbacks, he remained sanguine about the team's chances." },
+            { word: "Scrupulous", definition: "Diligent, thorough, and extremely attentive to details.", sentence: "The research was conducted with scrupulous attention to scientific protocols." },
+            { word: "Scrutinize", definition: "To examine or inspect closely and thoroughly.", sentence: "Customs officials began to scrutinize every bag coming off the international flight." },
+            { word: "Serendipity", definition: "The occurrence and development of events by chance in a happy or beneficial way.", sentence: "Finding my future business partner at a random coffee shop was pure serendipity." },
+            { word: "Servile", definition: "Having or showing an excessive willingness to serve or please others.", sentence: "He was annoyed by the servile attitude of the assistants who never disagreed with him." },
+            { word: "Solace", definition: "Comfort or consolation in a time of distress or sadness.", sentence: "She found solace in her music after the loss of her grandmother." },
+            { word: "Solicitous", definition: "Showing interest or concern.", sentence: "The hotel staff was incredibly solicitous, ensuring we had everything we needed." },
+            { word: "Sophistry", definition: "The use of fallacious arguments, especially with the intention of deceiving.", sentence: "The lawyer’s argument was a clever piece of sophistry designed to confuse the jury." },
+            { word: "Soporific", definition: "Tending to induce drowsiness or sleep.", sentence: "The motion of the train had a soporific effect, and I soon drifted off." },
+            { word: "Spurious", definition: "Not being what it purports to be; false or fake.", sentence: "The museum realized the painting was a spurious imitation and removed it from display." },
+            { word: "Stoic", definition: "A person who can endure pain or hardship without showing their feelings.", sentence: "He remained stoic throughout the long recovery process, never once complaining." },
+            { word: "Stringent", definition: "Strict, precise, and exacting.", sentence: "The university has very stringent requirements for admission to its medical school." },
+            { word: "Substantiate", definition: "To provide evidence to support or prove the truth of.", sentence: "There is currently no evidence to substantiate the claims made in the anonymous letter." },
+            { word: "Subtle", definition: "So delicate or precise as to be difficult to analyze or describe.", sentence: "The chef added a subtle hint of saffron to the sauce to enhance the flavor." },
+            { word: "Succinct", definition: "Briefly and clearly expressed.", sentence: "Her report was succinct and to the point, making it very easy to read." },
+            { word: "Superfluous", definition: "Unnecessary, especially through being more than enough.", sentence: "The extra explanation was superfluous since everyone already understood the plan." },
+            { word: "Surreptitious", definition: "Kept secret, especially because it would not be approved of.", sentence: "He took a surreptitious peek at his birthday presents hidden in the closet." },
+            { word: "Sycophant", definition: "A person who acts obsequiously toward someone important in order to gain advantage.", sentence: "The CEO was surrounded by sycophants who never challenged his bad decisions." },
+            { word: "Tacit", definition: "Understood or implied without being stated.", sentence: "By not objecting, the committee gave its tacit approval to the new project." },
+            { word: "Taciturn", definition: "Reserved or uncommunicative in speech; saying little.", sentence: "The shy boy was taciturn by nature, rarely speaking unless spoken to." },
+            { word: "Tangible", definition: "Perceptible by touch.", sentence: "The atmosphere of excitement in the stadium was almost tangible." },
+            { word: "Tenuous", definition: "Very weak or slight.", sentence: "The police have only a tenuous link between the suspect and the crime scene." },
+            { word: "Terse", definition: "Sparing in the use of words; abrupt.", sentence: "He gave a terse one-word answer that made it clear he was angry." },
+            { word: "Thwart", definition: "To prevent someone from accomplishing something.", sentence: "The security guards were able to thwart the attempted robbery." },
+            { word: "Tractable", definition: "Easy to control or influence.", sentence: "The dog was very tractable and learned new tricks within minutes." },
+            { word: "Transient", definition: "Lasting only for a short time; impermanent.", sentence: "The joy of winning was transient, soon replaced by the pressure of the next game." },
+            { word: "Trepidation", definition: "A feeling of fear or agitation about something that may happen.", sentence: "She entered the boss's office with a great deal of trepidation." },
+            { word: "Trite", definition: "Overused and consequently of little import; lacking originality.", sentence: "The movie was full of trite dialogue and predictable plot twists." },
+            { word: "Truncate", definition: "To shorten something by cutting off the top or the end.", sentence: "Because of the time limit, the speaker had to truncate her final presentation." },
+            { word: "Ubiquitous", definition: "Present, appearing, or found everywhere.", sentence: "Mobile phones have become ubiquitous in modern society." },
+            { word: "Unequivocal", definition: "Leaving no doubt; unambiguous.", sentence: "The lab results provided unequivocal proof of the patient's recovery." },
+            { word: "Untenable", definition: "Not able to be maintained or defended against attack or objection.", sentence: "The general realized their position on the hill was untenable and ordered a retreat." },
+            { word: "Vacillate", definition: "To alternate or waver between different opinions or actions.", sentence: "You cannot afford to vacillate when a quick decision is required." },
+            { word: "Venerate", definition: "To regard with great respect; revere.", sentence: "In many cultures, it is traditional to venerate one's ancestors." },
+            { word: "Veracity", definition: "Conformity to facts; accuracy.", sentence: "Officials began to doubt the veracity of the witness's testimony." },
+            { word: "Verbose", definition: "Using or expressed in more words than are needed.", sentence: "His verbose style of writing made even a simple email three pages long." },
+            { word: "Viable", definition: "Capable of working successfully; feasible.", sentence: "The committee is looking for a viable solution that fits within the budget." },
+            { word: "Vindicate", definition: "To clear someone of blame or suspicion.", sentence: "The new evidence will finally vindicate him after years of being wrongly accused." },
+            { word: "Virulent", definition: "Extremely severe or harmful in its effects.", sentence: "The city was hit by a particularly virulent strain of the flu." },
+            { word: "Vituperative", definition: "Bitter and abusive.", sentence: "The politician launched a vituperative attack on his opponent during the debate." },
+            { word: "Volatile", definition: "Liable to change rapidly and unpredictably.", sentence: "The political situation in the region remains highly volatile." },
+            { word: "Wary", definition: "Feeling or showing caution about possible dangers or problems.", sentence: "Experienced hikers are always wary of sudden changes in mountain weather." },
+            { word: "Wily", definition: "Skilled at gaining an advantage, especially deceitfully.", sentence: "The wily fox managed to escape the hunters once again." },
+            { word: "Zealous", definition: "Showing great energy or enthusiasm in pursuit of a cause.", sentence: "She is a zealous supporter of the local animal shelter." },
+            { word: "Zenith", definition: "The time at which something is most powerful or successful.", sentence: "The Roman Empire reached its zenith during the second century AD." }
         ];
 
         let currentWordObj = {};
@@ -688,7 +713,17 @@
         function renderRecents() {
             renderGenericList('recents-list', recents, false);
         }
-
+        function saveFromRecents(wordName) {
+            // Find the word object in the dictionary based on the name
+            const wordObj = dictionary.find(i => i.word === wordName);
+            if (wordObj) {
+                // We temporarily set currentWordObj so your existing addToFavorites() works
+                const previousCurrent = currentWordObj;
+                currentWordObj = wordObj;
+                addToFavorites();
+                currentWordObj = previousCurrent; // Restore original current word
+            }
+        }
         // Shared function to render lists
         function renderGenericList(elementId, dataArray, isDeletable) {
             const listElement = document.getElementById(elementId);
@@ -698,6 +733,34 @@
                 listElement.innerHTML = `<div style="text-align:center; color: #8e8e93; margin-top: 20px;">Empty list.</div>`;
                 return;
             }
+        
+            dataArray.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                
+                // Logic to decide which button to show
+                let actionButton = '';
+                if (isDeletable) {
+                    // "X" button for Favorites tab
+                    actionButton = `<button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>`;
+                } else {
+                    // "Save" button for Recents tab
+                    actionButton = `
+                        <button class="fav-btn-small" onclick="saveFromRecents('${item.word}')">
+                            <span>Add to Favorites</span>
+                        </button>`;
+                }
+        
+                li.innerHTML = `
+                    <div class="list-item-text">
+                        <strong>${item.word}</strong>
+                        <span>${item.definition}</span>
+                    </div>
+                    ${actionButton}
+                `;
+                listElement.appendChild(li);
+            });
+        }
 
             dataArray.forEach(item => {
                 const li = document.createElement('li');
