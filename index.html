@@ -215,11 +215,30 @@
     <div id="view-recents" class="content">
         <ul class="list-container" id="recents-list"></ul>
     </div>
-
+    <div id="view-quiz" class="content">
+        <div id="quiz-container">
+            <div class="card" onclick="toggleQuizFlip()" style="min-height: 250px; cursor: pointer; display: flex; flex-direction: column; justify-content: center;">
+                <div id="quiz-front">
+                    <div class="word-title" id="quiz-word">Start Quiz</div>
+                    <div style="color: var(--accent); font-size: 14px; margin-top: 10px;">Tap to see definition</div>
+                </div>
+                <div id="quiz-back" style="display: none;">
+                    <div class="word-def" id="quiz-def">...</div>
+                    <div class="word-sentence" id="quiz-sentence">...</div>
+                    <div style="color: var(--text-muted); font-size: 12px; margin-top: 10px;">Tap to hide</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="nextQuizWord()">Next Word</button>
+        </div>
+        <div id="quiz-empty" style="display: none; text-align: center; margin-top: 50px; color: var(--text-muted);">
+            Add some words to your Favorites to start a quiz!
+        </div>
+    </div>
     <div class="tab-bar">
         <div class="tab active" id="tab-discover" onclick="switchTab('discover')">Discover</div>
         <div class="tab" id="tab-recents" onclick="switchTab('recents')">Recents</div>
         <div class="tab" id="tab-favorites" onclick="switchTab('favorites')">Favorites</div>
+        <div class="tab" id="tab-quiz" onclick="switchTab('quiz')">Quiz</div>
     </div>
 
     <script>
@@ -705,7 +724,77 @@
             document.getElementById('tab-' + tabName).classList.add('active');
             document.getElementById('view-' + tabName).classList.add('active');
         }
-
+        let quizQueue = [];
+        let quizIndex = 0;
+        
+        function setupQuiz() {
+            if (favorites.length === 0) {
+                document.getElementById('quiz-container').style.display = 'none';
+                document.getElementById('quiz-empty').style.display = 'block';
+                return;
+            }
+        
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('quiz-empty').style.display = 'none';
+        
+            // Shuffle favorites and create a new queue
+            quizQueue = [...favorites].sort(() => Math.random() - 0.5);
+            quizIndex = 0;
+            showQuizWord();
+        }
+        
+        function showQuizWord() {
+            const wordObj = quizQueue[quizIndex];
+            document.getElementById('quiz-word').innerText = wordObj.word;
+            document.getElementById('quiz-def').innerText = wordObj.definition;
+            document.getElementById('quiz-sentence').innerText = wordObj.sentence ? `"${wordObj.sentence}"` : "";
+            
+            // Always hide definition when showing a new word
+            document.getElementById('quiz-front').style.display = 'block';
+            document.getElementById('quiz-back').style.display = 'none';
+        }
+        
+        function nextQuizWord() {
+            quizIndex++;
+            
+            // If we reach the end, reshuffle and start over
+            if (quizIndex >= quizQueue.length) {
+                showToast("Looping & Reshuffling!");
+                setupQuiz();
+            } else {
+                showQuizWord();
+            }
+        }
+        
+        function toggleQuizFlip() {
+            const front = document.getElementById('quiz-front');
+            const back = document.getElementById('quiz-back');
+            
+            if (front.style.display === 'none') {
+                front.style.display = 'block';
+                back.style.display = 'none';
+            } else {
+                front.style.display = 'none';
+                back.style.display = 'block';
+            }
+        }
+        
+        // Update your existing switchTab function to trigger setupQuiz
+        const originalSwitchTab = switchTab;
+        switchTab = function(tabName) {
+            // Add the quiz tab to the reset list in your original function
+            ['discover', 'favorites', 'recents', 'quiz'].forEach(t => {
+                document.getElementById('tab-' + t).classList.remove('active');
+                document.getElementById('view-' + t).classList.remove('active');
+            });
+        
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('view-' + tabName).classList.add('active');
+        
+            if (tabName === 'quiz') {
+                setupQuiz();
+            }
+        };
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.innerText = message;
