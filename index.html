@@ -204,6 +204,11 @@
     </div>
 
     <div id="view-favorites" class="content">
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="fav-search" placeholder="Search favorites..." 
+                   style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e5e5ea; font-size: 16px;"
+                   oninput="filterFavorites()">
+        </div>
         <ul class="list-container" id="favorites-list"></ul>
     </div>
 
@@ -652,7 +657,13 @@
         }
 
         function renderFavorites() {
-            renderGenericList('favorites-list', favorites, true);
+            // If the search bar has text, keep filtering; otherwise, show all
+            const searchTerm = document.getElementById('fav-search')?.value.toLowerCase() || "";
+            if (searchTerm) {
+                filterFavorites();
+            } else {
+                renderGenericList('favorites-list', favorites, true);
+            }
         }
 
         function renderRecents() {
@@ -701,7 +712,18 @@
             toast.style.opacity = '1';
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
-
+        function filterFavorites() {
+            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
+            
+            // Filter the favorites array based on word or definition
+            const filtered = favorites.filter(item => 
+                item.word.toLowerCase().includes(searchTerm) || 
+                item.definition.toLowerCase().includes(searchTerm)
+            );
+        
+            // Use your existing generic list renderer to show the filtered results
+            renderGenericList('favorites-list', filtered, true);
+        }
         window.onload = init;
     </script>
 </body>
