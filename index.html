@@ -173,7 +173,6 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
         }
 
         @media (max-width: 480px) {
@@ -624,18 +623,15 @@
         let quizQueue = [];
         let quizIndex = 0;
 
-        function init() {
-            generateWord();
-            renderFavorites();
-            renderRecents();
-        }
-
+        // --- CORE FUNCTIONS ---
         function generateWord() {
             const randomIndex = Math.floor(Math.random() * dictionary.length);
             currentWordObj = dictionary[randomIndex];
+            
             document.getElementById('display-word').innerText = currentWordObj.word;
             document.getElementById('display-def').innerText = currentWordObj.definition;
-            document.getElementById('display-sentence').innerText = currentWordObj.sentence ? `"${currentWordObj.sentence}"` : "No example sentence available.";
+            document.getElementById('display-sentence').innerText = currentWordObj.sentence ? `"${currentWordObj.sentence}"` : "";
+
             addToRecents(currentWordObj);
         }
 
@@ -649,6 +645,8 @@
 
         function addToFavorites(manualObj) {
             const target = manualObj || currentWordObj;
+            if (!target.word) return;
+            
             const exists = favorites.find(item => item.word === target.word);
             if (!exists) {
                 favorites.push(target);
@@ -665,36 +663,27 @@
             if (wordObj) addToFavorites(wordObj);
         }
 
-        function removeFavorite(word) {
-            favorites = favorites.filter(item => item.word !== word);
+        function removeFavorite(wordName) {
+            favorites = favorites.filter(item => item.word !== wordName);
             localStorage.setItem('lexicon_favorites', JSON.stringify(favorites));
             renderFavorites();
         }
 
-        function renderFavorites() {
-            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
-            if (searchTerm) {
-                filterFavorites();
-            } else {
-                renderGenericList('favorites-list', favorites, true);
-            }
-        }
-
-        function renderRecents() {
-            renderGenericList('recents-list', recents, false);
-        }
-
+        // --- RENDERERS ---
         function renderGenericList(elementId, dataArray, isDeletable) {
             const listElement = document.getElementById(elementId);
             listElement.innerHTML = '';
+            
             if (dataArray.length === 0) {
                 listElement.innerHTML = `<div style="text-align:center; color: #8e8e93; margin-top: 20px;">Empty list.</div>`;
                 return;
             }
+
             dataArray.forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'list-item';
-                let actionBtn = isDeletable 
+                
+                const actionBtn = isDeletable 
                     ? `<button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>`
                     : `<button class="fav-btn-small" onclick="saveFromRecents('${item.word}')"><span>Add to Favorites</span></button>`;
                 
@@ -709,25 +698,37 @@
             });
         }
 
-        function filterFavorites() {
-            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
-            const filtered = favorites.filter(item => 
-                item.word.toLowerCase().includes(searchTerm) || 
-                item.definition.toLowerCase().includes(searchTerm)
-            );
+        function renderFavorites() {
+            const searchInput = document.getElementById('fav-search');
+            const term = searchInput ? searchInput.value.toLowerCase() : "";
+            const filtered = term 
+                ? favorites.filter(i => i.word.toLowerCase().includes(term) || i.definition.toLowerCase().includes(term))
+                : favorites;
             renderGenericList('favorites-list', filtered, true);
         }
 
+        function renderRecents() {
+            renderGenericList('recents-list', recents, false);
+        }
+
+        function filterFavorites() {
+            renderFavorites();
+        }
+
+        // --- NAVIGATION ---
         function switchTab(tabName) {
-            ['discover', 'favorites', 'recents', 'quiz'].forEach(t => {
-                document.getElementById('tab-' + t).classList.remove('active');
-                document.getElementById('view-' + t).classList.remove('active');
+            ['discover', 'recents', 'favorites', 'quiz'].forEach(id => {
+                document.getElementById('view-' + id).classList.remove('active');
+                document.getElementById('tab-' + id).classList.remove('active');
             });
-            document.getElementById('tab-' + tabName).classList.add('active');
+
             document.getElementById('view-' + tabName).classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+
             if (tabName === 'quiz') setupQuiz();
         }
 
+        // --- QUIZ ---
         function setupQuiz() {
             if (favorites.length === 0) {
                 document.getElementById('quiz-container').style.display = 'none';
@@ -736,6 +737,7 @@
             }
             document.getElementById('quiz-container').style.display = 'block';
             document.getElementById('quiz-empty').style.display = 'none';
+            
             quizQueue = [...favorites].sort(() => Math.random() - 0.5);
             quizIndex = 0;
             showQuizWord();
@@ -746,6 +748,7 @@
             document.getElementById('quiz-word').innerText = wordObj.word;
             document.getElementById('quiz-def').innerText = wordObj.definition;
             document.getElementById('quiz-sentence').innerText = wordObj.sentence ? `"${wordObj.sentence}"` : "";
+            
             document.getElementById('quiz-front').style.display = 'block';
             document.getElementById('quiz-back').style.display = 'none';
         }
@@ -753,7 +756,7 @@
         function nextQuizWord() {
             quizIndex++;
             if (quizIndex >= quizQueue.length) {
-                showToast("Looping & Reshuffling!");
+                showToast("Reshuffling quiz...");
                 setupQuiz();
             } else {
                 showQuizWord();
@@ -763,11 +766,16 @@
         function toggleQuizFlip() {
             const front = document.getElementById('quiz-front');
             const back = document.getElementById('quiz-back');
-            const isFrontVisible = front.style.display !== 'none';
-            front.style.display = isFrontVisible ? 'none' : 'block';
-            back.style.display = isFrontVisible ? 'block' : 'none';
+            if (front.style.display === 'none') {
+                front.style.display = 'block';
+                back.style.display = 'none';
+            } else {
+                front.style.display = 'none';
+                back.style.display = 'block';
+            }
         }
 
+        // --- UTILS ---
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.innerText = message;
@@ -775,7 +783,12 @@
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
 
-        window.onload = init;
+        // --- INITIALIZE ---
+        window.onload = () => {
+            generateWord();
+            renderFavorites();
+            renderRecents();
+        };
     </script>
 </body>
 </html>
