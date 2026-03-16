@@ -78,7 +78,6 @@
             margin-bottom: 15px;
         }
 
-        /* Added style for the example sentence */
         .word-sentence {
             font-size: 16px;
             color: var(--text-main);
@@ -100,23 +99,11 @@
             transition: transform 0.1s;
         }
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-secondary { background-color: #e5e5ea; color: var(--accent); }
 
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: #e5e5ea;
-            color: var(--accent);
-        }
-
-        .list-container {
-            list-style: none;
-        }
+        .list-container { list-style: none; }
 
         .list-item {
             background-color: var(--card-bg);
@@ -129,16 +116,8 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
 
-        .list-item-text strong {
-            display: block;
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-        
-        .list-item-text span {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+        .list-item-text strong { display: block; font-size: 18px; margin-bottom: 4px; }
+        .list-item-text span { font-size: 14px; color: var(--text-muted); }
 
         .delete-btn {
             background: none;
@@ -167,9 +146,7 @@
             cursor: pointer;
         }
 
-        .tab.active {
-            color: var(--accent);
-        }
+        .tab.active { color: var(--accent); }
 
         .toast {
             position: fixed;
@@ -186,30 +163,23 @@
             pointer-events: none;
             z-index: 1000;
         }
+
         .fav-btn-small {
             background: none;
             border: 1px solid var(--accent);
             color: var(--accent);
             padding: 8px 12px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
         }
-        
-        /* On mobile, hide the text and just show the star */
+
         @media (max-width: 480px) {
-            .fav-btn-small span {
-                display: none;
-            }
-            .fav-btn-small::before {
-                content: "★";
-                font-size: 18px;
-            }
-            .fav-btn-small {
-                padding: 5px 10px;
-            }
+            .fav-btn-small span { display: none; }
+            .fav-btn-small::before { content: "★"; font-size: 18px; }
+            .fav-btn-small { padding: 5px 10px; }
         }
     </style>
 </head>
@@ -240,6 +210,7 @@
     <div id="view-recents" class="content">
         <ul class="list-container" id="recents-list"></ul>
     </div>
+
     <div id="view-quiz" class="content">
         <div id="quiz-container">
             <div class="card" onclick="toggleQuizFlip()" style="min-height: 250px; cursor: pointer; display: flex; flex-direction: column; justify-content: center;">
@@ -259,6 +230,7 @@
             Add some words to your Favorites to start a quiz!
         </div>
     </div>
+
     <div class="tab-bar">
         <div class="tab active" id="tab-discover" onclick="switchTab('discover')">Discover</div>
         <div class="tab" id="tab-recents" onclick="switchTab('recents')">Recents</div>
@@ -267,7 +239,6 @@
     </div>
 
     <script>
-        // Dictionary updated with sentences
         const dictionary = [
             { word: "Aberration", definition: "A departure from what is normal or expected.", sentence: "The sudden snowstorm in July was a total aberration for this climate." },
             { word: "Abstain", definition: "To restrain oneself from doing or enjoying something.", sentence: "He chose to abstain from dessert in an effort to eat healthier." },
@@ -650,6 +621,8 @@
         let currentWordObj = {};
         let favorites = JSON.parse(localStorage.getItem('lexicon_favorites')) || [];
         let recents = JSON.parse(localStorage.getItem('lexicon_recents')) || [];
+        let quizQueue = [];
+        let quizIndex = 0;
 
         function init() {
             generateWord();
@@ -660,38 +633,36 @@
         function generateWord() {
             const randomIndex = Math.floor(Math.random() * dictionary.length);
             currentWordObj = dictionary[randomIndex];
-            
             document.getElementById('display-word').innerText = currentWordObj.word;
             document.getElementById('display-def').innerText = currentWordObj.definition;
-            
-            // Display sentence (or a default if missing)
             document.getElementById('display-sentence').innerText = currentWordObj.sentence ? `"${currentWordObj.sentence}"` : "No example sentence available.";
-
             addToRecents(currentWordObj);
         }
 
         function addToRecents(wordObj) {
-            // Remove if already exists to move it to the top
             recents = recents.filter(item => item.word !== wordObj.word);
-            // Add to the beginning of the array
             recents.unshift(wordObj);
-            // Limit to top 20
             if (recents.length > 20) recents.pop();
-            
             localStorage.setItem('lexicon_recents', JSON.stringify(recents));
             renderRecents();
         }
 
-        function addToFavorites() {
-            const exists = favorites.find(item => item.word === currentWordObj.word);
+        function addToFavorites(manualObj) {
+            const target = manualObj || currentWordObj;
+            const exists = favorites.find(item => item.word === target.word);
             if (!exists) {
-                favorites.push(currentWordObj);
+                favorites.push(target);
                 localStorage.setItem('lexicon_favorites', JSON.stringify(favorites));
                 renderFavorites();
                 showToast("Saved to favorites!");
             } else {
                 showToast("Already in favorites!");
             }
+        }
+
+        function saveFromRecents(wordName) {
+            const wordObj = dictionary.find(i => i.word === wordName);
+            if (wordObj) addToFavorites(wordObj);
         }
 
         function removeFavorite(word) {
@@ -701,8 +672,7 @@
         }
 
         function renderFavorites() {
-            // If the search bar has text, keep filtering; otherwise, show all
-            const searchTerm = document.getElementById('fav-search')?.value.toLowerCase() || "";
+            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
             if (searchTerm) {
                 filterFavorites();
             } else {
@@ -713,114 +683,75 @@
         function renderRecents() {
             renderGenericList('recents-list', recents, false);
         }
-        function saveFromRecents(wordName) {
-            // Find the word object in the dictionary based on the name
-            const wordObj = dictionary.find(i => i.word === wordName);
-            if (wordObj) {
-                // We temporarily set currentWordObj so your existing addToFavorites() works
-                const previousCurrent = currentWordObj;
-                currentWordObj = wordObj;
-                addToFavorites();
-                currentWordObj = previousCurrent; // Restore original current word
-            }
-        }
-        // Shared function to render lists
+
         function renderGenericList(elementId, dataArray, isDeletable) {
             const listElement = document.getElementById(elementId);
             listElement.innerHTML = '';
-            
             if (dataArray.length === 0) {
                 listElement.innerHTML = `<div style="text-align:center; color: #8e8e93; margin-top: 20px;">Empty list.</div>`;
                 return;
             }
-        
             dataArray.forEach(item => {
                 const li = document.createElement('li');
                 li.className = 'list-item';
+                let actionBtn = isDeletable 
+                    ? `<button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>`
+                    : `<button class="fav-btn-small" onclick="saveFromRecents('${item.word}')"><span>Add to Favorites</span></button>`;
                 
-                // Logic to decide which button to show
-                let actionButton = '';
-                if (isDeletable) {
-                    // "X" button for Favorites tab
-                    actionButton = `<button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>`;
-                } else {
-                    // "Save" button for Recents tab
-                    actionButton = `
-                        <button class="fav-btn-small" onclick="saveFromRecents('${item.word}')">
-                            <span>Add to Favorites</span>
-                        </button>`;
-                }
-        
                 li.innerHTML = `
                     <div class="list-item-text">
                         <strong>${item.word}</strong>
                         <span>${item.definition}</span>
                     </div>
-                    ${actionButton}
+                    ${actionBtn}
                 `;
                 listElement.appendChild(li);
             });
         }
 
-            dataArray.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'list-item';
-                li.innerHTML = `
-                    <div class="list-item-text">
-                        <strong>${item.word}</strong>
-                        <span>${item.definition}</span>
-                    </div>
-                    ${isDeletable ? `<button class="delete-btn" onclick="removeFavorite('${item.word}')">×</button>` : ''}
-                `;
-                listElement.appendChild(li);
-            });
+        function filterFavorites() {
+            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
+            const filtered = favorites.filter(item => 
+                item.word.toLowerCase().includes(searchTerm) || 
+                item.definition.toLowerCase().includes(searchTerm)
+            );
+            renderGenericList('favorites-list', filtered, true);
         }
 
         function switchTab(tabName) {
-            // Reset all tabs/views
-            ['discover', 'favorites', 'recents'].forEach(t => {
+            ['discover', 'favorites', 'recents', 'quiz'].forEach(t => {
                 document.getElementById('tab-' + t).classList.remove('active');
                 document.getElementById('view-' + t).classList.remove('active');
             });
-
-            // Set active
             document.getElementById('tab-' + tabName).classList.add('active');
             document.getElementById('view-' + tabName).classList.add('active');
+            if (tabName === 'quiz') setupQuiz();
         }
-        let quizQueue = [];
-        let quizIndex = 0;
-        
+
         function setupQuiz() {
             if (favorites.length === 0) {
                 document.getElementById('quiz-container').style.display = 'none';
                 document.getElementById('quiz-empty').style.display = 'block';
                 return;
             }
-        
             document.getElementById('quiz-container').style.display = 'block';
             document.getElementById('quiz-empty').style.display = 'none';
-        
-            // Shuffle favorites and create a new queue
             quizQueue = [...favorites].sort(() => Math.random() - 0.5);
             quizIndex = 0;
             showQuizWord();
         }
-        
+
         function showQuizWord() {
             const wordObj = quizQueue[quizIndex];
             document.getElementById('quiz-word').innerText = wordObj.word;
             document.getElementById('quiz-def').innerText = wordObj.definition;
             document.getElementById('quiz-sentence').innerText = wordObj.sentence ? `"${wordObj.sentence}"` : "";
-            
-            // Always hide definition when showing a new word
             document.getElementById('quiz-front').style.display = 'block';
             document.getElementById('quiz-back').style.display = 'none';
         }
-        
+
         function nextQuizWord() {
             quizIndex++;
-            
-            // If we reach the end, reshuffle and start over
             if (quizIndex >= quizQueue.length) {
                 showToast("Looping & Reshuffling!");
                 setupQuiz();
@@ -828,54 +759,22 @@
                 showQuizWord();
             }
         }
-        
+
         function toggleQuizFlip() {
             const front = document.getElementById('quiz-front');
             const back = document.getElementById('quiz-back');
-            
-            if (front.style.display === 'none') {
-                front.style.display = 'block';
-                back.style.display = 'none';
-            } else {
-                front.style.display = 'none';
-                back.style.display = 'block';
-            }
+            const isFrontVisible = front.style.display !== 'none';
+            front.style.display = isFrontVisible ? 'none' : 'block';
+            back.style.display = isFrontVisible ? 'block' : 'none';
         }
-        
-        // Update your existing switchTab function to trigger setupQuiz
-        const originalSwitchTab = switchTab;
-        switchTab = function(tabName) {
-            // Add the quiz tab to the reset list in your original function
-            ['discover', 'favorites', 'recents', 'quiz'].forEach(t => {
-                document.getElementById('tab-' + t).classList.remove('active');
-                document.getElementById('view-' + t).classList.remove('active');
-            });
-        
-            document.getElementById('tab-' + tabName).classList.add('active');
-            document.getElementById('view-' + tabName).classList.add('active');
-        
-            if (tabName === 'quiz') {
-                setupQuiz();
-            }
-        };
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.innerText = message;
             toast.style.opacity = '1';
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
-        function filterFavorites() {
-            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
-            
-            // Filter the favorites array based on word or definition
-            const filtered = favorites.filter(item => 
-                item.word.toLowerCase().includes(searchTerm) || 
-                item.definition.toLowerCase().includes(searchTerm)
-            );
-        
-            // Use your existing generic list renderer to show the filtered results
-            renderGenericList('favorites-list', filtered, true);
-        }
+
         window.onload = init;
     </script>
 </body>
