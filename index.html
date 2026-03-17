@@ -351,6 +351,10 @@
             document.getElementById('view-' + tabName).classList.add('active');
             document.getElementById('tab-' + tabName).classList.add('active');
             if (tabName === 'quiz') setupQuiz();
+            if (tabName === 'favorites') {
+                document.getElementById('fav-search').value = ''; // Clear search when opening tab
+                renderFavorites(); 
+            }
         }
 
         function toggleQuizFlip() {
@@ -370,7 +374,18 @@
         function saveFromRecents(n) { const o = dictionary.find(i => i.word === n); if (o) addToFavorites(o); }
         function renderRecents() { renderGenericList('recents-list', recents, false); }
         function renderFavorites() { renderGenericList('favorites-list', favorites, true); }
-        function filterFavorites() { renderFavorites(); }
+        function filterFavorites() {
+            const searchTerm = document.getElementById('fav-search').value.toLowerCase();
+            
+            // Create a filtered version of the favorites array
+            const filtered = favorites.filter(item => 
+                item.word.toLowerCase().includes(searchTerm) || 
+                item.definition.toLowerCase().includes(searchTerm)
+            );
+            
+            // Pass the filtered list to the generic renderer
+            renderGenericList('favorites-list', filtered, true);
+        }
 
         window.onload = () => { generateWord(); renderFavorites(); renderRecents(); };
     </script>
